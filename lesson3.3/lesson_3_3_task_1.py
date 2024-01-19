@@ -1,17 +1,16 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
-import unittest
+import pytest
 
-# Watch source file lesson1.6_step11
-
-
-class test_autofill(unittest.TestCase):
-    def setUp(self):
+class TestAutofill:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self):
         self.driver = webdriver.Chrome()
+        yield
+        self.teardown_method()
 
     def fill_form(self, link):
-
         browser = self.driver
         browser.implicitly_wait(3)
         browser.get(link)
@@ -21,32 +20,25 @@ class test_autofill(unittest.TestCase):
         browser.find_element(By.CSS_SELECTOR, '.first_block .second').send_keys("Romaniv")
         browser.find_element(By.CSS_SELECTOR, '.third_class .third').send_keys("test_email@gmail.com")
 
-        # Send filled in form
+        # Send filled-in form
         browser.find_element(By.CSS_SELECTOR, 'button.btn').click()
-        # ждем загрузки страницы
+        # Wait for page to load
         time.sleep(1)
-        # находим элемент, содержащий текст, и записываем в переменную
+        # Find the element containing text and store it in a variable
         welcome_text = browser.find_element(By.TAG_NAME, 'h1').text
-        # Возваращаем текст
+        # Return text
         return welcome_text
 
     def test_registration(self):
         link = 'http://suninjuly.github.io/registration1.html'
         registration_result = self.fill_form(link)
-        # с помощью assert проверяем, что ожидаемый текст совпадает с текстом на странице сайта
-        self.assertEqual("Congratulations! You have successfully registered!", registration_result)
+        assert registration_result == "Congratulations! You have successfully registered!"
 
     def test_registration_bug(self):
         link = 'http://suninjuly.github.io/registration2.html'
         registration_result = self.fill_form(link)
-        self.assertEqual("Congratulations! You have successfully registered!", registration_result)
+        assert registration_result == "Congratulations! You have successfully registered!"
 
-    def tearDown(self):
-        # закрываем браузер после всех манипуляций
+    def teardown_method(self):
+        # Close the browser after all manipulations
         self.driver.quit()
-
-    "http://suninjuly.github.io/registration1.html"
-
-
-if __name__ == "__main__":
-    unittest.main()

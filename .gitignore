@@ -1,3 +1,4 @@
 /other
 /get_method.py
 /.venv
+.env*
